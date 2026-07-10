@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import torch
-
 from src.deep_pinn import PINN, data_loss, get_device, physics_residual_loss, total_loss, train_pinn
 
 

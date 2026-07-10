@@ -10,6 +10,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib
+
+matplotlib.use("Agg")  # backend non-interactif : requis sur runners CI/serveurs headless
+
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt

@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-
 from src.numerical_core import create_spatiotemporal_grid
 from src.visualization import plot_interactive_surface, plot_prediction_and_error
 

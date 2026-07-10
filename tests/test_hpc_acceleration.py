@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import numpy as np
-
 from src.hpc_acceleration import (
+    ProfilingResult,
     fast_local_filter,
     naive_local_filter,
     parameter_sweep,
@@ -31,6 +31,11 @@ def test_profile_filter_returns_positive_timings_and_speedup() -> None:
     assert result.naive_seconds >= 0.0
     assert result.jit_seconds >= 0.0
     assert result.speedup > 0.0
+
+
+def test_profiling_result_speedup_handles_zero_jit_time() -> None:
+    result = ProfilingResult(naive_seconds=1.0, jit_seconds=0.0)
+    assert result.speedup == float("inf")
 
 
 def test_parameter_sweep_evaluates_all_combinations() -> None:

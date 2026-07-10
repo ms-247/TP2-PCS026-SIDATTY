@@ -7,9 +7,13 @@ __pycache__/
 .coverage
 coverage.xml
 htmlcov/
-outputs/figures/*.pdf
-outputs/figures/*.html
-outputs/models/*.pt
+outputs/*
+!outputs/figures/
+!outputs/models/
+outputs/figures/*
+!outputs/figures/.gitkeep
+outputs/models/*
+!outputs/models/.gitkeep
 *.egg-info/
 .snakemake/
 .claude/

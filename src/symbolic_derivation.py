@@ -8,7 +8,8 @@ NumPy vectorisees via sympy.lambdify.
 
 from __future__ import annotations
 
-from typing import Callable, cast
+from collections.abc import Callable
+from typing import cast
 
 import numpy as np
 import numpy.typing as npt
@@ -65,9 +66,12 @@ def build_residual_expression(
     return x, t, u_num, f_num
 
 
+LambdifiedFunc = Callable[[FloatArray, FloatArray], FloatArray]
+
+
 def lambdify_solution(
     c_value: float, nu_value: float
-) -> tuple[Callable[[FloatArray, FloatArray], FloatArray], Callable[[FloatArray, FloatArray], FloatArray]]:
+) -> tuple[LambdifiedFunc, LambdifiedFunc]:
     """Compile u(x,t) et f(x,t) en fonctions NumPy vectorisees via lambdify.
 
     Retourne un couple (u_func, f_func) applicables directement sur des
@@ -75,12 +79,6 @@ def lambdify_solution(
     """
     x, t, u_num, f_num = build_residual_expression(c_value, nu_value)
 
-    u_func = cast(
-        Callable[[FloatArray, FloatArray], FloatArray],
-        sp.lambdify((x, t), u_num, modules="numpy"),
-    )
-    f_func = cast(
-        Callable[[FloatArray, FloatArray], FloatArray],
-        sp.lambdify((x, t), f_num, modules="numpy"),
-    )
+    u_func = cast(LambdifiedFunc, sp.lambdify((x, t), u_num, modules="numpy"))
+    f_func = cast(LambdifiedFunc, sp.lambdify((x, t), f_num, modules="numpy"))
     return u_func, f_func

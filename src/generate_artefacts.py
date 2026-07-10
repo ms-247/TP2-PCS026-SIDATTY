@@ -45,7 +45,15 @@ def train_and_save(model_path: Path = MODEL_PATH, epochs: int = 50) -> Path:
     u_flat = torch.tensor(u_exact.reshape(-1, 1), dtype=torch.float32, device=device)
 
     train_pinn(
-        model, x_flat, t_flat, x_flat[:50], t_flat[:50], u_flat[:50], c_value, nu_value, epochs=epochs
+        model,
+        x_flat,
+        t_flat,
+        x_flat[:50],
+        t_flat[:50],
+        u_flat[:50],
+        c_value,
+        nu_value,
+        epochs=epochs,
     )
 
     model_path.parent.mkdir(parents=True, exist_ok=True)
@@ -71,7 +79,12 @@ def generate_plots(model_path: Path = MODEL_PATH) -> tuple[Path, Path]:
     absolute_error = np.abs(u_predicted - u_exact)
 
     pdf_path = plot_prediction_and_error(
-        x_grid, t_grid, u_predicted, absolute_error, OUTPUT_DIR / "figures" / "prediction_error.pdf", use_tex=False
+        x_grid,
+        t_grid,
+        u_predicted,
+        absolute_error,
+        OUTPUT_DIR / "figures" / "prediction_error.pdf",
+        use_tex=False,
     )
     html_path = plot_interactive_surface(
         x_grid, t_grid, u_predicted, OUTPUT_DIR / "figures" / "surface_3d.html"

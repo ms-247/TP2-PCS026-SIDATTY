@@ -6,7 +6,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from src.numerical_core import (
     apply_residual_vectorized,
     build_hilbert_matrix,

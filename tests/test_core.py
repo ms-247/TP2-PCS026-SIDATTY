@@ -10,7 +10,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from src.generate_artefacts import build_reference_grid, generate_plots, train_and_save
 
 

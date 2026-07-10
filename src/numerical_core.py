@@ -8,8 +8,9 @@ types flottants (float16/32/64) et validation robuste par np.isclose.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, TypedDict
+from typing import TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -24,7 +25,10 @@ FloatArray = npt.NDArray[np.float64]
 
 
 def create_spatiotemporal_grid(
-    n: int, m: int, x_range: tuple[float, float] = (-5.0, 5.0), t_range: tuple[float, float] = (0.0, 2.0)
+    n: int,
+    m: int,
+    x_range: tuple[float, float] = (-5.0, 5.0),
+    t_range: tuple[float, float] = (0.0, 2.0),
 ) -> tuple[FloatArray, FloatArray]:
     """Cree une grille bidimensionnelle (X, T) de taille N x M (C-contiguous)."""
     x = np.linspace(x_range[0], x_range[1], n, dtype=np.float64)
@@ -74,7 +78,9 @@ def slice_is_view(arr: FloatArray, row_slice: slice, col_slice: slice) -> tuple[
     return sliced, is_view
 
 
-def fancy_index_is_copy(arr: FloatArray, row_indices: npt.NDArray[np.intp]) -> tuple[FloatArray, bool]:
+def fancy_index_is_copy(
+    arr: FloatArray, row_indices: npt.NDArray[np.intp]
+) -> tuple[FloatArray, bool]:
     """Realise une indexation avancee (fancy indexing), toujours une copie effective."""
     selected = arr[row_indices]
     is_view = selected.base is not None
@@ -87,7 +93,9 @@ def fancy_index_is_copy(arr: FloatArray, row_indices: npt.NDArray[np.intp]) -> t
 
 
 def ingest_sensor_coordinates(
-    path: Path, lat_range: tuple[float, float] = (-90.0, 90.0), lon_range: tuple[float, float] = (-180.0, 180.0)
+    path: Path,
+    lat_range: tuple[float, float] = (-90.0, 90.0),
+    lon_range: tuple[float, float] = (-180.0, 180.0),
 ) -> tuple[FloatArray, FloatArray]:
     """Scanne un fichier Parquet de capteurs en mode Lazy et filtre les coordonnees valides.
 
@@ -107,7 +115,9 @@ def ingest_sensor_coordinates(
 
 
 def apply_residual_vectorized(
-    f_func: Callable[[FloatArray, FloatArray], FloatArray], x_coords: FloatArray, t_coords: FloatArray
+    f_func: Callable[[FloatArray, FloatArray], FloatArray],
+    x_coords: FloatArray,
+    t_coords: FloatArray,
 ) -> FloatArray:
     """Applique la fonction residuelle f(x,t) sur des coordonnees via broadcasting NumPy.
 
@@ -149,8 +159,9 @@ def reconstruction_error_by_precision(matrix: FloatArray, rhs: FloatArray) -> Pr
     for dtype in (np.float16, np.float32, np.float64):
         a_cast = matrix.astype(dtype)
         b_cast = rhs.astype(dtype)
-        solution = np.linalg.solve(a_cast.astype(np.float64), b_cast.astype(np.float64)).astype(dtype)
-        residual = a_cast.astype(np.float64) @ solution.astype(np.float64) - b_cast.astype(np.float64)
+        a64, b64 = a_cast.astype(np.float64), b_cast.astype(np.float64)
+        solution = np.linalg.solve(a64, b64).astype(dtype)
+        residual = a64 @ solution.astype(np.float64) - b64
         errors[np.dtype(dtype).name] = float(np.linalg.norm(residual))
     return PrecisionErrors(
         float16=errors["float16"], float32=errors["float32"], float64=errors["float64"]
@@ -169,8 +180,8 @@ def perturb_and_propagate(
     perturbation = epsilon * rng.standard_normal(rhs.shape)
     rhs_perturbed = rhs + perturbation
 
-    alpha = np.linalg.solve(matrix, rhs)
-    alpha_perturbed = np.linalg.solve(matrix, rhs_perturbed)
+    alpha: FloatArray = np.linalg.solve(matrix, rhs).astype(np.float64)
+    alpha_perturbed: FloatArray = np.linalg.solve(matrix, rhs_perturbed).astype(np.float64)
 
     relative_error = float(np.linalg.norm(alpha_perturbed - alpha) / np.linalg.norm(alpha))
     return alpha, alpha_perturbed, relative_error

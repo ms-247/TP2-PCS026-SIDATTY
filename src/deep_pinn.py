@@ -60,25 +60,20 @@ def physics_residual_loss(model: PINN, x: Tensor, t: Tensor, c: float, nu: float
     u = model(x, t)
 
     grad_outputs = torch.ones_like(u)
-    du_dx = cast(
-        Tensor, torch.autograd.grad(u, x, grad_outputs=grad_outputs, create_graph=True)[0]
-    )
-    du_dt = cast(
-        Tensor, torch.autograd.grad(u, t, grad_outputs=grad_outputs, create_graph=True)[0]
-    )
-    d2u_dx2 = cast(
-        Tensor,
-        torch.autograd.grad(du_dx, x, grad_outputs=torch.ones_like(du_dx), create_graph=True)[0],
-    )
+    du_dx = torch.autograd.grad(u, x, grad_outputs=grad_outputs, create_graph=True)[0]
+    du_dt = torch.autograd.grad(u, t, grad_outputs=grad_outputs, create_graph=True)[0]
+    d2u_dx2 = torch.autograd.grad(
+        du_dx, x, grad_outputs=torch.ones_like(du_dx), create_graph=True
+    )[0]
 
     residual = du_dt + c * du_dx - nu * d2u_dx2
-    return cast(Tensor, torch.mean(residual**2))
+    return torch.mean(residual**2)
 
 
 def data_loss(model: PINN, x_data: Tensor, t_data: Tensor, u_data: Tensor) -> Tensor:
     """Erreur quadratique moyenne aux points de mesure issus des capteurs."""
     prediction = model(x_data, t_data)
-    return cast(Tensor, torch.mean((prediction - u_data) ** 2))
+    return torch.mean((prediction - u_data) ** 2)
 
 
 def total_loss(
@@ -96,7 +91,7 @@ def total_loss(
     """Combine perte physique et perte donnees/conditions aux limites."""
     l_physics = physics_residual_loss(model, x_physics, t_physics, c, nu)
     l_data = data_loss(model, x_data, t_data, u_data)
-    return cast(Tensor, physics_weight * l_physics + data_weight * l_data)
+    return physics_weight * l_physics + data_weight * l_data
 
 
 def train_pinn(
@@ -118,7 +113,7 @@ def train_pinn(
     for _ in range(epochs):
         optimizer.zero_grad()
         loss = total_loss(model, x_physics, t_physics, x_data, t_data, u_data, c, nu)
-        loss.backward()
+        loss.backward()  # type: ignore[no-untyped-call]
         optimizer.step()
         history.append(float(loss.item()))
 

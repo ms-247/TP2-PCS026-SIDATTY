@@ -9,7 +9,7 @@ est ensuite distribue sur plusieurs processus avec Joblib.
 from __future__ import annotations
 
 import timeit
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 import numpy.typing as npt
@@ -37,7 +37,7 @@ def naive_local_filter(grid: FloatArray, radius: int = 1) -> FloatArray:
     return output
 
 
-@njit(parallel=True, fastmath=True, cache=True)  # type: ignore[misc]
+@njit(parallel=True, fastmath=True, cache=True)
 def fast_local_filter(grid: FloatArray, radius: int) -> FloatArray:
     """Version JIT-compilee (Numba) du filtre de moyenne glissante 2D.
 
@@ -48,7 +48,7 @@ def fast_local_filter(grid: FloatArray, radius: int) -> FloatArray:
     """
     n_rows, n_cols = grid.shape
     output = np.zeros_like(grid)
-    for i in prange(n_rows):
+    for i in prange(n_rows):  # type: ignore[no-untyped-call,attr-defined]
         for j in range(n_cols):
             i_min = max(0, i - radius)
             i_max = min(n_rows, i + radius + 1)

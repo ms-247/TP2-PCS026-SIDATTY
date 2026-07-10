@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 import sympy as sp
-
 from src.symbolic_derivation import (
     build_residual_expression,
     compute_derivatives,
@@ -24,7 +23,8 @@ def test_get_symbols_returns_four_real_symbols() -> None:
 def test_solitary_wave_solution_is_tanh() -> None:
     x, t, c, _ = get_symbols()
     u = solitary_wave_solution(x, t, c)
-    assert u.func == sp.tanh
+    assert sp.simplify(u - sp.tanh(x - c * t)) == 0
+    assert any(atom.func == sp.tanh for atom in u.atoms(sp.tanh))
 
 
 def test_compute_derivatives_matches_analytical_tanh_derivative() -> None:
