@@ -79,7 +79,7 @@ def generate_plots(model_path: Path = MODEL_PATH) -> tuple[Path, Path]:
     absolute_error = np.abs(u_predicted - u_exact)
 
     pdf_path = plot_prediction_and_error(
-        "invalid_x_grid_type",
+        x_grid,
         t_grid,
         u_predicted,
         absolute_error,
