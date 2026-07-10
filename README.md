@@ -19,8 +19,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh        # Linux / macOS
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
 
 # 2. Cloner le depot et se placer a la racine
-git clone <url-du-depot>
-cd phd_integrator_project
+git clone https://github.com/ms-247/TP2-PCS026-SIDATTY.git
+cd TP2-PCS026-SIDATTY
 
 # 3. Synchroniser l'environnement virtuel isole a partir du verrouillage deterministe
 uv sync --all-groups
@@ -144,9 +144,7 @@ regressions :
 
 ## 6. Badges de statut et artefacts
 
-```markdown
-![CI/CD](https://github.com/<owner>/<repo>/actions/workflows/ci_cd_pipeline.yml/badge.svg)
-```
+![CI/CD](https://github.com/ms-247/TP2-PCS026-SIDATTY/actions/workflows/ci_cd_pipeline.yml/badge.svg)
 
 Les artefacts scientifiques (figures PDF vectorielles, surface 3D HTML
 interactive, poids du modele PINN `.pt`) sont publies automatiquement par le
