@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+outputs/figures/*.pdf
+outputs/figures/*.html
+outputs/models/*.pt
+*.egg-info/
+.snakemake/
+.claude/
