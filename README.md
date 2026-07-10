@@ -128,19 +128,26 @@ perturbation lineaire `||dalpha||/||alpha|| <= kappa(A) * ||db||/||b||`.
 
 ## 5. Validation experimentale du pipeline CI/CD (Module 9.2)
 
-Procedure suivie pour demontrer que le pipeline detecte reellement les
-regressions :
+Demonstration reellement executee sur ce depot pour prouver que le pipeline
+detecte les regressions, avec les commits correspondants :
 
-1. Une erreur de typage flagrante est introduite temporairement (ex. appel
-   d'une fonction `numerical_core` attendant un `np.ndarray` avec une
-   chaine `str`).
-2. Le commit est pousse sur une branche ; le job `mypy --strict` du
-   workflow `ci_cd_pipeline.yml` echoue immediatement, bloquant le badge de
-   statut.
-3. L'erreur est corrigee, un test de non-regression cible est ajoute dans
-   `tests/`, et le correctif est documente via un commit respectant la
-   norme **Conventional Commits** (ex. `fix(numerical-core): reject
-   non-ndarray input in ingest_sensor_coordinates`).
+1. **Erreur injectee** (`c9a67e6` — `test(ci): inject a deliberate type
+   error to validate the mypy gate`) : l'appel a
+   `plot_prediction_and_error(...)` dans `generate_plots()`
+   (`src/generate_artefacts.py`) recevait la chaine `"invalid_x_grid_type"`
+   a la place de la grille `x_grid: np.ndarray`.
+2. **Echec observe** : le push a immediatement fait echouer le job
+   `Static Analysis - Type Checking (Mypy)` du workflow
+   `ci_cd_pipeline.yml` sur les trois versions Python de la matrice
+   (`mypy --strict` : `Argument 1 ... has incompatible type "str"; expected
+   "ndarray[...]"`), passant le badge de statut au rouge.
+3. **Correction** (`ee50c27` — `fix(generate-artefacts): pass ndarray grid
+   instead of a stray string`) : l'argument correct est restaure et un test
+   de non-regression cible (`test_build_reference_grid_returns_ndarrays_at_minimal_grid_size`
+   dans `tests/test_core.py`) verifie, au cas limite `n_x=n_t=2`, que les
+   grilles produites restent bien des `np.ndarray` avant d'etre transmises
+   a la fonction de trace — conformement a la norme **Conventional
+   Commits**.
 
 ## 6. Badges de statut et artefacts
 
